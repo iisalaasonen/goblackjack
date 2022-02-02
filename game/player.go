@@ -5,6 +5,7 @@ type Player struct {
 	Score int
 }
 
+// parseCard converts card string value to int
 func parseCard(c card) int {
 	var value int
 	switch c.value {
@@ -34,6 +35,7 @@ func parseCard(c card) int {
 	return value
 }
 
+// CalculateScore calculates player/dealer score of their current hand/cards
 func CalculateScore(player *Player) {
 	hasAce := false
 	score := 0
@@ -45,6 +47,8 @@ func CalculateScore(player *Player) {
 		score += cardValue
 
 	}
+	// ace has default value of 1 (only one ace can have value 11)
+	// if possible add 10 to make one ace as value 11
 	if hasAce {
 		if score <= 11 {
 			score += 10
@@ -53,6 +57,7 @@ func CalculateScore(player *Player) {
 	player.Score = score
 }
 
+// PrintHand takes cards slice and returns hand values as string
 func PrintHand(cards []card) string {
 	var hand string
 	for _, c := range cards {
