@@ -36,10 +36,10 @@ func parseCard(c card) int {
 }
 
 // CalculateScore calculates player/dealer score of their current hand/cards
-func CalculateScore(player *Player) {
+func CalculateScore(cards []card) int {
 	hasAce := false
 	score := 0
-	for _, card := range player.Cards {
+	for _, card := range cards {
 		if card.value == "A" {
 			hasAce = true
 		}
@@ -54,7 +54,7 @@ func CalculateScore(player *Player) {
 			score += 10
 		}
 	}
-	player.Score = score
+	return score
 }
 
 // PrintHand takes cards slice and returns hand values as string

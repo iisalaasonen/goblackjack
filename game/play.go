@@ -4,10 +4,6 @@ deck, player, dealer, scoring and play options
 */
 package game
 
-import (
-	"fmt"
-)
-
 // InitializeDeck creates new 52 card deck and shuffles it
 func InitializeDeck() []card {
 	newDeck := createDeck()
@@ -15,39 +11,42 @@ func InitializeDeck() []card {
 	return newDeck
 }
 
-// PlayerLoop handles player options to split, hit or stand
-// returns status after no options are available
-func PlayerLoop(player *Player, deck []card) string {
-	var status string
-	if player.Cards[0].value == player.Cards[1].value {
-		fmt.Println("SPLIT OPTION")
+//Hit adds card to player cards and checks the score
+//returns player game status, player can bust or keep playing
+func Hit(player *Player, deck []card) ([]card, string) {
+	newDeck := AddCard(player, deck)
+	player.Score = CalculateScore(player.Cards)
+	if player.Score > 21 {
+		return newDeck, "busted"
 	}
-	for {
-		fmt.Println("YOUR HAND ", PrintHand(player.Cards))
-		fmt.Println("YOUR SCORE ", player.Score)
-		var option string
-		fmt.Println("HIT (H) OR STAND (S): ")
-		fmt.Scan(&option)
-		switch option {
-		case "H", "h":
-			deck = Pop(deck, player)
-			CalculateScore(player)
-			if player.Score > 21 {
-				status = "busted"
-				return status
-			}
-		case "S", "s":
-			status = "stand"
-			return status
+	return newDeck, "playing"
+}
+
+//IsSplits checks if player has an option to split two cards
+//split is possible if two cards are same and card value is over 9
+func IsSplit(cards []card) bool {
+	if cards[0].value == cards[1].value {
+		score := CalculateScore(cards)
+		if score >= 18 {
+			return true
 		}
 	}
+	return false
+}
+
+//AddCard first pops card from deck and adds that card to the player cards
+//returns deck with minus 1 length
+func AddCard(player *Player, deck []card) []card {
+	d, c := Pop(deck)
+	player.Cards = append(player.Cards, c)
+	return d
 }
 
 // DealerLoop gives dealer score
 func DealerLoop(dealer *Player, deck []card) {
 	// dealer hits until at least 17 is reached
 	for dealer.Score < 17 {
-		deck = Pop(deck, dealer)
-		CalculateScore(dealer)
+		deck = AddCard(dealer, deck)
+		dealer.Score = CalculateScore(dealer.Cards)
 	}
 }

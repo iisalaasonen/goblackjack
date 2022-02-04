@@ -39,11 +39,10 @@ func shuffleDeck(deck []card) []card {
 
 // Pop removes the last card from the deck and adds that card to player/dealer cards slice
 // returns new deck slice which has len-1
-func Pop(deck []card, player *Player) (d []card) {
+func Pop(deck []card) (d []card, c card) {
 	l := len(deck)
-	c := deck[l-1]
-	player.Cards = append(player.Cards, c)
+	c = deck[l-1]
 	newDeck := make([]card, 0)
 	newDeck = append(newDeck, deck[:l-1]...)
-	return newDeck
+	return newDeck, c
 }
