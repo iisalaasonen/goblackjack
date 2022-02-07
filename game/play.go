@@ -14,6 +14,9 @@ func InitializeDeck() []card {
 //Hit adds card to player cards and checks the score
 //returns player game status, player can bust or keep playing
 func Hit(player *Player, deck []card) ([]card, string) {
+	if player.Score == 21 {
+		return deck, "stand"
+	}
 	newDeck := AddCard(player, deck)
 	player.Score = CalculateScore(player.Cards)
 	if player.Score > 21 {
