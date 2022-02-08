@@ -31,7 +31,10 @@ func main() {
 		} else {
 			var choice string
 			status := "playing"
-			isSplit := game.IsSplit(player.Cards)
+			isSplit, err := game.IsSplit(player.Cards)
+			if err != nil {
+				fmt.Println(err)
+			}
 			fmt.Println("SPLIT ", isSplit)
 			for status == "playing" {
 				fmt.Println("YOUR HAND: ", game.PrintHand(player.Cards))

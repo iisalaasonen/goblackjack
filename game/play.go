@@ -4,6 +4,8 @@ deck, player, dealer, scoring and play options
 */
 package game
 
+import "errors"
+
 // InitializeDeck creates new 52 card deck and shuffles it
 func InitializeDeck() []card {
 	newDeck := createDeck()
@@ -27,14 +29,17 @@ func Hit(player *Player, deck []card) ([]card, string) {
 
 //IsSplits checks if player has an option to split two cards
 //split is possible if two cards are same and card value is over 9
-func IsSplit(cards []card) bool {
+func IsSplit(cards []card) (bool, error) {
+	if len(cards) != 2 {
+		return false, errors.New("split can have only 2 cards")
+	}
 	if cards[0].value == cards[1].value {
 		score := CalculateScore(cards)
 		if score >= 18 {
-			return true
+			return true, nil
 		}
 	}
-	return false
+	return false, nil
 }
 
 //AddCard first pops card from deck and adds that card to the player cards
