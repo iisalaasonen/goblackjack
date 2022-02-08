@@ -32,7 +32,10 @@ func main() {
 			var splitChoice string
 			var split bool
 			var splitPlayer game.Player
-			isSplit := game.IsSplit(player.Cards)
+			isSplit, err := game.IsSplit(player.Cards)
+			if err != nil {
+				fmt.Println(err)
+			}
 			if isSplit {
 				fmt.Println("YOUR HAND: ", game.PrintHand(player.Cards))
 				fmt.Println("WANT TO SPLIT (Y OR N): ")
