@@ -22,16 +22,62 @@ func TestCreateDeck(t *testing.T) {
 }
 
 func TestPop(t *testing.T) {
-	deck := createDeck()
-	beforeLen := len(deck)
-	afterLen := beforeLen - 1
-	poppedCard := deck[beforeLen-1]
-	newDeck, c := Pop(deck)
-	if len(newDeck) != afterLen {
-		t.Error("")
+	var deck []card
+	var poppedCard card
+	deck = append(deck, card{
+		value: "5",
+		suit:  "clubs",
+	},
+		card{
+			value: "10",
+			suit:  "clubs",
+		},
+		card{
+			value: "K",
+			suit:  "hearts",
+		},
+		card{
+			value: "A",
+			suit:  "clubs",
+		},
+		card{
+			value: "4",
+			suit:  "spades",
+		})
+	popCards := []struct {
+		wantCard card
+		wantLen  int
+	}{
+		{
+			wantCard: card{
+				value: "4",
+				suit:  "spades",
+			},
+			wantLen: 4,
+		},
+		{
+			wantCard: card{
+				value: "A",
+				suit:  "clubs",
+			},
+			wantLen: 3,
+		},
 	}
-	if poppedCard.value != c.value && poppedCard.suit != c.suit {
-		t.Error("Cards are not the same")
+	for _, c := range popCards {
+		deck, poppedCard = Pop(deck)
+		if c.wantCard != poppedCard {
+			t.Errorf("Expected popped card to be: %+v got: %+v", c.wantCard, poppedCard)
+		}
+		if len(deck) != c.wantLen {
+			t.Errorf("Expected new deck length to be: %d got: %d", c.wantLen, len(deck))
+		}
+
 	}
 
 }
+
+/*
+func TestShuffle(t *testing.T) {
+
+}
+*/
