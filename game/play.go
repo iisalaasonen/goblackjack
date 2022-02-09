@@ -4,7 +4,10 @@ deck, player, dealer, scoring and play options
 */
 package game
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 // InitializeDeck creates new 52 card deck and shuffles it
 func InitializeDeck() []card {
@@ -56,5 +59,47 @@ func DealerLoop(dealer *Player, deck []card) {
 	for dealer.Score < 17 {
 		deck = AddCard(dealer, deck)
 		dealer.Score = CalculateScore(dealer.Cards)
+	}
+}
+
+func Playing(player *Player, deck []card) (string, []card) {
+	var choice string
+	status := "playing"
+	for status == "playing" {
+		if player.Score == 21 {
+			return "stand", deck
+		}
+		fmt.Println("YOUR HAND: ", PrintHand(player.Cards))
+		fmt.Println("YOUR SCORE: ", player.Score)
+		fmt.Println("HIT (H) OR STAND (S): ")
+		fmt.Scan(&choice)
+		switch choice {
+		case "H", "h":
+			deck, status = Hit(player, deck)
+		case "S", "s":
+			status = "stand"
+		}
+	}
+	return status, deck
+}
+
+func ShowResult(status string, dealer *Player, player *Player, deck []card) {
+	switch status {
+	case "busted":
+		fmt.Println("BUSTED WITH SCORE: ", player.Score)
+		fmt.Println("YOU LOSE")
+	case "stand":
+		DealerLoop(dealer, deck)
+		fmt.Println("DEALER HAND: ", PrintHand(dealer.Cards))
+		fmt.Println("DEALER SCORE: ", dealer.Score)
+		if dealer.Score > 21 {
+			fmt.Println("YOU WON!")
+		} else if dealer.Score == player.Score {
+			fmt.Println("PUSH!")
+		} else if dealer.Score > player.Score {
+			fmt.Println("YOU LOSE!")
+		} else {
+			fmt.Println("YOU WON!")
+		}
 	}
 }

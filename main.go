@@ -29,42 +29,40 @@ func main() {
 			fmt.Println("DEALER HAND: ", game.PrintHand(dealer.Cards))
 			fmt.Println("DEALER GOT BLACKJACK! YOU LOSE!")
 		} else {
-			var choice string
-			status := "playing"
+			var splitChoice string
+			var split bool
+			var splitPlayer game.Player
 			isSplit, err := game.IsSplit(player.Cards)
 			if err != nil {
 				fmt.Println(err)
 			}
-			fmt.Println("SPLIT ", isSplit)
-			for status == "playing" {
+			if isSplit {
 				fmt.Println("YOUR HAND: ", game.PrintHand(player.Cards))
-				fmt.Println("YOUR SCORE: ", player.Score)
-				fmt.Println("HIT (H) OR STAND (S): ")
-				fmt.Scan(&choice)
-				switch choice {
-				case "H", "h":
-					deck, status = game.Hit(&player, deck)
-				case "S", "s":
-					status = "stand"
+				fmt.Println("WANT TO SPLIT (Y OR N): ")
+				fmt.Scan(&splitChoice)
+				if splitChoice != "Y" && splitChoice != "y" {
+					split = false
+				} else {
+					split = true
 				}
 			}
-			switch status {
-			case "busted":
-				fmt.Println("BUSTED WITH SCORE: ", player.Score)
-				fmt.Println("YOU LOSE")
-			case "stand":
-				game.DealerLoop(&dealer, deck)
-				fmt.Println("DEALER HAND: ", game.PrintHand(dealer.Cards))
-				fmt.Println("DEALER SCORE: ", dealer.Score)
-				if dealer.Score > 21 {
-					fmt.Println("YOU WON!")
-				} else if dealer.Score == player.Score {
-					fmt.Println("PUSH!")
-				} else if dealer.Score > player.Score {
-					fmt.Println("YOU LOSE!")
-				} else {
-					fmt.Println("YOU WON!")
-				}
+			if split {
+				var status1, status2 string
+				splitPlayer.Cards = append(splitPlayer.Cards, player.Cards[1])
+				player.Cards = player.Cards[:1]
+				fmt.Println("FIRST SPLIT CARD:")
+				player.Score = game.CalculateScore(player.Cards)
+				status1, deck = game.Playing(&player, deck)
+				fmt.Println("SECOND SPLIT CARD:")
+				splitPlayer.Score = game.CalculateScore(splitPlayer.Cards)
+				status2, deck = game.Playing(&splitPlayer, deck)
+				fmt.Println("FIRST SPLIT CARD RESULT:")
+				game.ShowResult(status1, &dealer, &player, deck)
+				fmt.Println("SECOND SPLIT CARD RESULT:")
+				game.ShowResult(status2, &dealer, &splitPlayer, deck)
+			} else {
+				status, deck := game.Playing(&player, deck)
+				game.ShowResult(status, &dealer, &player, deck)
 			}
 		}
 		var again string
