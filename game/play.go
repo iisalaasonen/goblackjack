@@ -78,7 +78,10 @@ func Playing(player *Player, deck []card) (string, []card) {
 			deck, status = Hit(player, deck)
 		case "S", "s":
 			status = "stand"
+		default:
+			status = "stand"
 		}
+
 	}
 	return status, deck
 }

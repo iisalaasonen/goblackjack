@@ -1,6 +1,7 @@
 package game
 
 import (
+	"os"
 	"testing"
 )
 
@@ -344,5 +345,140 @@ func TestDealerLoop(t *testing.T) {
 		if len(d.Player.Cards) != d.want {
 			t.Errorf("Expected dealer cards length to be: %d got: %d", d.want, len(d.Player.Cards))
 		}
+	}
+}
+
+func TestPlaying(t *testing.T) {
+	var gotStatus string
+	deck := []card{
+		{
+			value: "3",
+			suit:  "clubs",
+		},
+		{
+			value: "10",
+			suit:  "hearts",
+		},
+		{
+			value: "6",
+			suit:  "clubs",
+		},
+		{
+			value: "Q",
+			suit:  "diamonds",
+		},
+	}
+
+	testPlayers := []struct {
+		*Player
+		input          string
+		expectedStatus string
+		expectedDeck   int
+	}{
+		{Player: &Player{
+			Cards: []card{
+				{
+					value: "6",
+					suit:  "spades",
+				},
+				{
+					value: "8",
+					suit:  "clubs",
+				},
+			},
+			Score: 14,
+		},
+			input:          "s",
+			expectedStatus: "stand",
+			expectedDeck:   4},
+		{Player: &Player{
+			Cards: []card{
+				{
+					value: "4",
+					suit:  "spades",
+				},
+				{
+					value: "6",
+					suit:  "clubs",
+				},
+				{
+					value: "Q",
+					suit:  "clubs",
+				},
+			},
+			Score: 20,
+		},
+			input:          "h",
+			expectedStatus: "busted",
+			expectedDeck:   3},
+	}
+	for _, p := range testPlayers {
+		input := []byte(p.input)
+		r, w, err := os.Pipe()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		_, err = w.Write(input)
+		if err != nil {
+			t.Error(err)
+		}
+		w.Close()
+
+		stdin := os.Stdin
+		// Restore stdin right after the test.
+		defer func() { os.Stdin = stdin }()
+		os.Stdin = r
+		gotStatus, deck = Playing(p.Player, deck)
+		if gotStatus != p.expectedStatus {
+			t.Errorf("Expected %s got: %s", p.expectedStatus, gotStatus)
+		}
+		if len(deck) != p.expectedDeck {
+			t.Errorf("Expected new deck length to be %d got %d: ", p.expectedDeck, len(deck))
+		}
+	}
+	hitPlayer := struct {
+		*Player
+		expectedStatus string
+		expectedDeck   int
+	}{
+		Player: &Player{
+			Cards: []card{
+				{
+					value: "3",
+					suit:  "hearts",
+				},
+				{
+					value: "2",
+					suit:  "clubs",
+				},
+			},
+			Score: 5,
+		},
+		expectedStatus: "stand",
+		expectedDeck:   0,
+	}
+	input := []byte("h")
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = w.Write(input)
+	if err != nil {
+		t.Error(err)
+	}
+	w.Close()
+
+	stdin := os.Stdin
+	// Restore stdin right after the test.
+	defer func() { os.Stdin = stdin }()
+	os.Stdin = r
+	gotStatus, deck = Playing(hitPlayer.Player, deck)
+	if gotStatus != "stand" {
+		t.Error("Expected stand got: ", gotStatus)
+	}
+	if len(deck) != 1 {
+		t.Errorf("Expected new deck length to be 1 got: %d", len(deck))
 	}
 }
