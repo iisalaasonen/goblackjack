@@ -19,7 +19,7 @@ func main() {
 		}
 		player.Score = game.CalculateScore(player.Cards)
 		dealer.Score = game.CalculateScore(dealer.Cards)
-		fmt.Println("DEALER HAS ", dealer.Cards[0])
+		fmt.Println("DEALER HAND: ", game.PrintHand(dealer.Cards[:1]))
 		if player.Score == 21 && dealer.Score == 21 {
 			fmt.Println("BOTH HAVE BLACKJACK!")
 		} else if player.Score == 21 {
@@ -68,7 +68,7 @@ func main() {
 		var again string
 		fmt.Println("PLAY AGAIN (P) OR QUIT (Q): ")
 		fmt.Scan(&again)
-		if again == "Q" || again == "q" {
+		if again != "P" && again != "p" {
 			os.Exit(1)
 		}
 

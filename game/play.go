@@ -66,11 +66,11 @@ func Playing(player *Player, deck []card) (string, []card) {
 	var choice string
 	status := "playing"
 	for status == "playing" {
+		fmt.Println("YOUR HAND: ", PrintHand(player.Cards))
+		fmt.Println("YOUR SCORE: ", player.Score)
 		if player.Score == 21 {
 			return "stand", deck
 		}
-		fmt.Println("YOUR HAND: ", PrintHand(player.Cards))
-		fmt.Println("YOUR SCORE: ", player.Score)
 		fmt.Println("HIT (H) OR STAND (S): ")
 		fmt.Scan(&choice)
 		switch choice {
